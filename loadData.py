@@ -1,11 +1,12 @@
 import gzip
+import json
 import random
 
 import paddle
 import paddle.nn.functional as F
 import numpy as np
 
-def load_data(mode = 'train' | None):
+def load_data(mode = 'train'):
     """
     It loads the dataset from the file `data/mnist.json.gz` and returns the images and labels for the specified mode
 
@@ -14,7 +15,7 @@ def load_data(mode = 'train' | None):
 
     dataset_path = 'data/mnist.json.gz'
     print('dataset start loading from {}....'.format(dataset_path))
-    dataset = gzip.open(dataset_path)
+    dataset = json.load(gzip.open(dataset_path))
     print('dataset loading success!')
 
     train_dataset, val_dataset, eval_dataset = dataset
@@ -44,6 +45,28 @@ def load_data(mode = 'train' | None):
         # shuffle the data when mode == 'train'
         if  mode == 'train':
             random.shuffle(index_list)
+
+        imgs_list = []
+        labels_list = []
+
+        for i in index_list:
+            img = np.array(imgs[i]).astype('float32')
+            label = np.array(labels[i]).astype('float32')
+
+            imgs_list.append(img)
+            labels_list.append(label)
+
+            if len(imgs_list) == batch_size:
+                yield np.array(imgs_list), np.array(labels_list)
+
+                imgs_list = []
+                labels_list = []
+
+        if len(imgs_list) >0:
+            yield np.array(imgs_list), np.array(labels_list)
+
+    return data_generator
+
 
 
 
