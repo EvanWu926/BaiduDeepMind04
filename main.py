@@ -10,12 +10,13 @@
 2022/12/6 21:58   Evan       1.0         None
 '''
 import json
+import random
 
 # import lib
 import paddle
 from paddle.nn import Linear
 import paddle.nn.functional as F
-import numpy
+import numpy as np
 import gzip
 
 # 声明数据集位置
@@ -29,6 +30,24 @@ print('mnist dataset load done')
 # setting training_dataset, val_dataset, test_dataset
 train_dataset, val_dataset, test_dataset = mnist_dataset
 
-imgs, labels = train_dataset[0], train_dataset[1]
-print(train_dataset.shape)
+train_imgs, train_labels = train_dataset[0], train_dataset[1]
+# print('train data length: imgs:{}, labels:{}'.format(len(imgs), len(labels)))
 
+# imgs, labels = val_dataset[0], val_dataset[1]
+# print('val data length: {}, {}'.format(len(imgs), len(labels)))
+
+# imgs, labels = val = test_dataset[0], test_dataset[1]
+# print('test data length: {}, {}'.format(len(imgs), len(labels)))
+
+# create index for data
+index_list = list(range(len(train_imgs)))
+# init batch size
+batch_size = 100
+random.shuffle(index_list)
+imgs_list = []
+label_list = []
+
+def data_generator():
+
+    for i in index_list:
+        img = np.array(train_imgs[i]).astype('float32')
