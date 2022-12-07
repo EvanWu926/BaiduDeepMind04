@@ -44,10 +44,33 @@ index_list = list(range(len(train_imgs)))
 # init batch size
 batch_size = 100
 random.shuffle(index_list)
-imgs_list = []
-label_list = []
 
 def data_generator():
+    imgs_list = []
+    label_list = []
 
     for i in index_list:
         img = np.array(train_imgs[i]).astype('float32')
+        label = np.array(train_labels[i]).astype('float32')
+        imgs_list.append(img)
+        label_list.append(label)
+
+        if len(imgs_list) == batch_size:
+            yield np.array(imgs_list), np.array(label_list)
+            imgs_list = []
+            label_list = []
+
+    if len(imgs_list) > 0:
+        yield np.array(imgs_list), np.array(label_list)
+    return data_generator
+
+
+train_loader = data_generator
+# 以迭代的形式读取数据
+for batch_id, data in enumerate(train_loader()):
+    image_data, label_data = data
+    if batch_id == 0:
+        # 打印数据shape和类型
+        print("打印第一个batch数据的维度:")
+        print("图像维度: {}, 标签维度: {}".format(image_data.shape, label_data.shape))
+    break
