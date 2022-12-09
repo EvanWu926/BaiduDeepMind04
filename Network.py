@@ -1,17 +1,20 @@
 # It's a linear layer with 784 input features and 1 output feature.
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
-'''
-@File    :   Network.py    
+"""
+@File    :   Network.py
 @Contact :   252392785@qq.com
 @License :   (C)Copyright 2022-2029
 
-@Modify Time      @Author    @Version    @Desciption
+@Modify Time      @Author    @Version    @Description
 ------------      -------    --------    -----------
 2022/12/7 21:25   Evan       1.0         None
-'''
+"""
+
+
 import paddle.nn
-from loadData import *
+import paddle.nn.functional as F
+from main import *
 
 # import lib
 
@@ -34,12 +37,15 @@ def train(model):
     model = MNSIT()
     model.train()
 
-    train_data =load_data(mode='train')
+
+    train_dataset = MnistDataset(mode='train')
+    train_loader = paddle.io.DataLoader(train_dataset, batch_size=100, shuffle=True, drop_last=True, num_workers=4)
+
     opt = paddle.optimizer.SGD(learning_rate=0.001, parameters=model.parameters())
     # train num is 10
     epoch_num = 10
     for epoch_id in range(epoch_num):
-        for batch_id, data in enumerate(train_data()):
+        for batch_id, data in enumerate(train_loader()):
             images, labels = data
             images = paddle.to_tensor(images)
             labels = paddle.to_tensor(labels)
@@ -49,7 +55,7 @@ def train(model):
             loss = F.square_error_cost(predict, labels)
             avg_loss = paddle.mean(loss)
 
-            if batch_id % 200 ==0:
+            if batch_id % 100 ==0:
                 print("epoch: {}, batch: {}, loss is: {}".format(epoch_id, batch_id, avg_loss.numpy()))
 
             avg_loss.backward()
